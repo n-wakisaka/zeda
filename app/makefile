@@ -29,3 +29,6 @@ install: $(CHKDEP) $(TARGET)
 clean:
 	@echo " CLEAN"
 	-@rm -f *.o *~ core $(TARGET)
+uninstall: $(CHKDEP) $(TARGET)
+	@echo " UNINSTALL" $^
+	-@rm -f $(addprefix $(BINDIR)/, $^)
