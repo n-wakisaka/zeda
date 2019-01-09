@@ -42,4 +42,3 @@ uninstall:
 	fi
 	@echo " UNINSTALL	applications"
 	@cd $(APPDIR); make uninstall
-
