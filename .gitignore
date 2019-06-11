@@ -1,8 +1,11 @@
-*.so
-*.o
-config
 GPATH
 GRTAGS
 GSYMS
 GTAGS
-zeda-config
+config
+src/*.o
+app/*
+!app/*.c
+!app/makefile
+lib/*
+!lib/.gitkeep
