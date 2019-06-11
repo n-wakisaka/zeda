@@ -1,7 +1,10 @@
 ZEDA - Elementary Data and Algorithms
 Copyright (C) 1998 Tomomichi Sugihara (Zhidao)
 
-|master [![Build Status](https://travis-ci.org/n-wakisaka/zeda.svg?branch=master)](https://travis-ci.org/n-wakisaka/zeda)| develop [![Build Status](https://travis-ci.org/n-wakisaka/zeda.svg?branch=develop)](https://travis-ci.org/n-wakisaka/zeda)|
+| *master* | *develop* |
+|----------|-----------|
+| [![Build Status](https://travis-ci.org/n-wakisaka/zeda.svg?branch=master)](https://travis-ci.org/n-wakisaka/zeda) | [![Build Status](https://travis-ci.org/n-wakisaka/zeda.svg?branch=develop)](https://travis-ci.org/n-wakisaka/zeda) |
+
 
 -----------------------------------------------------------------
 [What is this?]
