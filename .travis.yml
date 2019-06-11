@@ -1,4 +1,10 @@
 language: c
 sudo: false
+before_script:
+  - mkdir -p ~/usr/include
+  - mkdir -p ~/usr/bin
+  - mkdir -p ~/usr/lib
+  - export PATH=$PATH:~/usr/bin
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/usr/lib
 script:
   - make
