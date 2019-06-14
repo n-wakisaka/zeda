@@ -10,6 +10,7 @@ CONFIG=zeda-config
 CONFIGGEN=zeda-config-gen
 CHKDEP=zeda-chkdep
 TARGET=$(CONFIG)
+INSTALLTARGET=$(CONFIGGEN) $(CHKDEP) $(TARGET)
 
 #####################################################################
 all: $(TARGET)
@@ -18,12 +19,12 @@ $(CONFIG):
 	@echo " GENERATE" $(CONFIG)
 	-@rm -f $(CONFIG)
 	@sh $(CONFIGGEN) -I $(PREFIX)/include -L $(PREFIX)/lib -l "$(LINK)" -v $(VERSION) > $(CONFIG)
-install: $(CONFIGGEN) $(CHKDEP) $(TARGET)
+install: $(INSTALLTARGET)
 	@echo " INSTALL	" $^
 	@$(INSTALL) $^ $(BINDIR)
 clean:
 	@echo " CLEAN"
 	-@rm -f *.o *~ core $(TARGET)
-uninstall: $(CONFIGGEN) $(CHKDEP) $(TARGET)
-	@echo " UNINSTALL $^"
-	-@rm -f $(addprefix $(BINDIR)/, $^)
+uninstall:
+	@echo " UNINSTALL $(INSTALLTARGET)"
+	-@rm -f $(addprefix $(BINDIR)/, $(INSTALLTARGET))
