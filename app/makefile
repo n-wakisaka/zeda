@@ -14,22 +14,16 @@ TARGET=$(CONFIG)
 #####################################################################
 all: $(TARGET)
 
-config-gen: $(CONFIGGEN)
-	@echo " INSTALL" $(CONFIGGEN)
-	@$(INSTALL) $(CONFIGGEN) $(BINDIR)
 $(CONFIG):
 	@echo " GENERATE" $(CONFIG)
 	-@rm -f $(CONFIG)
-	@$(CONFIGGEN) -I $(PREFIX)/include -L $(PREFIX)/lib -l "$(LINK)" -v $(VERSION) > $(CONFIG)
-install: $(CHKDEP) $(TARGET)
-	@echo " INSTALL	" $(CHKDEP)
-	@$(INSTALL) $(CHKDEP) $(BINDIR)
+	@sh $(CONFIGGEN) -I $(PREFIX)/include -L $(PREFIX)/lib -l "$(LINK)" -v $(VERSION) > $(CONFIG)
+install: $(CONFIGGEN) $(CHKDEP) $(TARGET)
 	@echo " INSTALL	" $^
 	@$(INSTALL) $^ $(BINDIR)
 clean:
 	@echo " CLEAN"
 	-@rm -f *.o *~ core $(TARGET)
-uninstall:
-	@echo " UNINSTALL $(CHKDEP) $(TARGET)"
-	-@rm -f $(addprefix $(BINDIR)/, $(TARGET))
-	-@rm -f $(addprefix $(BINDIR)/, $(CHKDEP))
+uninstall: $(CONFIGGEN) $(CHKDEP) $(TARGET)
+	@echo " UNINSTALL $^"
+	-@rm -f $(addprefix $(BINDIR)/, $^)

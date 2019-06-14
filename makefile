@@ -14,7 +14,7 @@ LIBFILE=`grep DLIB= $(SRCDIR)/makefile | cut -d = -f2`
 
 all:
 	@cd $(SRCDIR); make
-	@cd $(APPDIR); make config-gen all
+	@cd $(APPDIR); make
 autotest:
 	@cd $(TESTDIR); ./test.sh
 doc:
