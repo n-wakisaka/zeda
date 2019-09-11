@@ -39,15 +39,15 @@ typedef zIndexStruct *zIndex;
 /*! \brief increment size of an index vector. */
 #define zIndexIncSize(i)     ( zArraySize(i)++ )
 /*! \brief decrement size of an index vector. */
-#define zIndexDecSize(i)     ( zArraySize(i) -= (zArraySize(i)>0 ? 1:0) )
+#define zIndexDecSize(i)     ( zArraySize(i) -= ( zArraySize(i) > 0 ? 1 : 0 ) )
 
 /*! \brief check if the specified position is valid for an index vector. */
-#define zIndexPosIsValid(i,n) ( (n) >= 0 && (n) < zArraySize(i) )
+#define zIndexPosIsValid(i,n) zArrayPosIsValid( i, n )
 
 #define zIndexElemNC(i,n)      zArrayBuf(i)[n]
 #define zIndexElem(i,n)        ( zIndexPosIsValid(i,n) ? zIndexElemNC(i,n) : -1 )
 #define zIndexSetElemNC(i,n,e) ( zIndexElemNC(i,n) = (e) )
-#define zIndexSetElem(i,n,e)   if( zIndexPosIsValid(i,n) ) zIndexSetElemNC(i,n,e)
+#define zIndexSetElem(i,n,e)   ( zIndexPosIsValid(i,n) ? zIndexSetElemNC(i,n,e) : -1 )
 
 #define zIndexHead(idx)      ( *zArrayHead(idx) )
 #define zIndexNeck(idx)      ( *zArrayNeck(idx) )
@@ -106,25 +106,21 @@ zIndex zIndexSetList(zIndex idx, ...);
  */
 __EXPORT void zIndexFree(zIndex idx);
 
-/*! \brief cleanup an array of integer values.
+/*! \brief zero an array of integer values.
  *
- * zIndexClear() sets all elements of a zIndex instance
- * \a idex for zero.
- * \return a pointer \a idx.
+ * zIndexZero() sets all components of an array of index values
+ * \a idex for zeros.
+ * \retval a pointer \a idx.
  */
-__EXPORT zIndex zIndexClear(zIndex idx);
+__EXPORT zIndex zIndexZero(zIndex idx);
 
 /*! \brief order an array of integer values.
  *
- * zIndexOrder() sets all elements of \a idx in order,
+ * zIndexOrder() sets all components of \a idx in order,
  * beginning from \a s as { \a s, \a s+1, \a s+2, ... }.
- * \return a pointer \a idx.
- * \note
- * zIndexOrder() is not available in the kernel space.
+ * \retval a pointer \a idx.
  */
-#ifndef __KERNEL__
 __EXPORT zIndex zIndexOrder(zIndex idx, int s);
-#endif /* __KERNEL__ */
 
 /*! \brief check if two arrays of integer values are equal.
  *

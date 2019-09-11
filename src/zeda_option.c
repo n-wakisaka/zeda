@@ -43,7 +43,7 @@ void zOptionDiag(zOption *opts)
       eprintf( "-%s", op->key );
     else
       eprintf( "--%s", op->longkey );
-    eprintf( "-> %s [%s]\n", op->arg ? op->arg : "NULL", zBoolExpr(op->flag) );
+    eprintf( "-> %s [%s]\n", op->arg ? op->arg : "NULL", zBoolStr(op->flag) );
   }
 }
 
@@ -81,7 +81,7 @@ bool _zOptionFindLongKey(zOption *opts, char *key, zOption **cur)
 }
 
 /* read command line options. */
-bool zOptionRead(zOption *opts, char **argv, zStrList *arglist)
+bool zOptionRead(zOption *opts, char **argv, zStrAddrList *arglist)
 {
   zOption *cur;
   bool cnt;
@@ -95,9 +95,8 @@ bool zOptionRead(zOption *opts, char **argv, zStrList *arglist)
         cnt = false;
         cur = NULL;
       } else{
-        if( arglist && !zStrListInsert( arglist, *argv, false ) ){
+        if( arglist && !zStrAddrListAdd( arglist, *argv ) )
           ret = false;
-        }
       }
       continue;
     }
