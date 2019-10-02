@@ -324,6 +324,21 @@ void ZTKDestroy(ZTK *ztk)
   ZTKTagFieldListDestroy( &ztk->tflist );
 }
 
+/* parse a tag with a ZTK format processor. */
+bool ZTKParseTag(ZTK *ztk, char *buf)
+{
+  if( !( ztk->def = ZTKDefListFindTag( &ztk->deflist, buf ) ) ){
+    /* unregisterred tagged field, skipped */
+    ztk->tf_cp = NULL;
+  } else{
+    if( !( ztk->tf_cp = ZTKTagFieldListNew( buf ) ) ) /* allocate a new tagged field */
+      return false;
+    zListInsertHead( &ztk->tflist, ztk->tf_cp );
+    ztk->kf_cp = NULL; /* unactivate the key field */
+  }
+  return true;
+}
+
 /* scan a file and parse it into a tag-and-key list of a ZTK format processor. */
 bool ZTKParse(ZTK *ztk, char *path)
 {
@@ -333,28 +348,19 @@ bool ZTKParse(ZTK *ztk, char *path)
 
   if( !( fs = zFileStackPush( &ztk->fs, path ) ) ) return false;
   while( !feof( fs->fp ) ){
-    if( !zFSkipDefaultComment( fs->fp ) ) break;
     if( !zFToken( fs->fp, buf, BUFSIZ ) ) break;
     if( zTokenIsTag( buf ) ){
       zExtractTag( buf, buf );
-      if( !( ztk->def = ZTKDefListFindTag( &ztk->deflist, buf ) ) ){
-        /* unregisterred tagged field, skipped */
-        ztk->tf_cp = NULL;
-      } else{
-        if( !( ztk->tf_cp = ZTKTagFieldListNew( buf ) ) ){ /* allocate a new tagged field */
-          ret = false;
-          break;
-        }
-        zListInsertHead( &ztk->tflist, ztk->tf_cp );
-        ztk->kf_cp = NULL; /* unactivate the key field */
+      if( !ZTKParseTag( ztk, buf ) ){
+        ret = false;
+        break;
       }
     } else{ /* might be a key or a value */
       if( strcmp( buf, "include" ) == 0 ){ /* include a file */
-        if( !zFSkipDefaultComment( fs->fp ) ) break;
         ZTKParse( ztk, zFToken(fs->fp,buf,BUFSIZ) );
         continue;
       }
-      if( !ztk->def ) continue; /* tagged field unactivated */
+      if( !ztk->def && !ZTKParseTag( ztk, "" ) ) continue; /* tagged field unactivated */
       if( !ztk->tf_cp ){ /* the corresponding tagged field must be activated. */
         ZRUNERROR( ZEDA_ERR_FATAL );
         ret = false;
@@ -366,7 +372,12 @@ bool ZTKParse(ZTK *ztk, char *path)
           break;
         }
       } else{
-        if( !ztk->kf_cp ) continue; /* skipped if the key field is unactivated */
+        if( !ztk->kf_cp ){ /* add and activate a null key field */
+          if( !( ztk->kf_cp = ZTKKeyFieldListNew( &ztk->tf_cp->data.kflist, "" ) ) ){
+            ret = false;
+            break;
+          }
+        }
         if( !ZTKKeyFieldAddVal( &ztk->kf_cp->data, buf ) ){ /* token is a value. */
           ret = false;
           break;
@@ -519,8 +530,8 @@ bool ZTKDefListRegPrp(ZTKDefList *list, char *tag, ZTKPrp prp[], int num)
   return true;
 }
 
-/* encode a key field of a ZTK format processor based on a ZTK property. */
-void *_ZTKEncodeKey(void *obj, void *arg, ZTK *ztk, ZTKPrp prp[], int num)
+/* evaluate a key field of a ZTK format processor based on a ZTK property. */
+void *_ZTKEvalKey(void *obj, void *arg, ZTK *ztk, ZTKPrp prp[], int num)
 {
   register int i;
   int *count;
@@ -532,11 +543,11 @@ void *_ZTKEncodeKey(void *obj, void *arg, ZTK *ztk, ZTKPrp prp[], int num)
   }
   do{
     for( i=0; i<num; i++ )
-      if( ZTKKeyCmp( ztk, prp[i].str ) && prp[i].encode ){
+      if( ZTKKeyCmp( ztk, prp[i].str ) && prp[i]._eval ){
         if( prp[i].num > 0 && count[i] >= prp[i].num ){
           ZRUNWARN( ZEDA_WARN_ZTK_TOOMANY_KEYS, prp[i].str );
         } else
-        if( !prp[i].encode( obj, count[i]++, arg, ztk ) ){
+        if( !prp[i]._eval( obj, count[i]++, arg, ztk ) ){
           obj = NULL;
           goto TERMINATE;
         }
@@ -554,16 +565,16 @@ void _ZTKPrpKeyFPrint(FILE *fp, void *obj, ZTKPrp prp[], int num)
   register int i, j;
 
   for( i=0; i<num; i++ )
-    if( prp[i].fprintf ){
+    if( prp[i]._fprint ){
       for( j=0; j<prp[i].num; j++ ){
         fprintf( fp, "%s: ", prp[i].str );
-        prp[i].fprintf( fp, j, obj );
+        prp[i]._fprint( fp, j, obj );
       }
     }
 }
 
-/* encode a tag field of a ZTK format processor based on a ZTK property. */
-void *_ZTKEncodeTag(void *obj, void *arg, ZTK *ztk, ZTKPrp prp[], int num)
+/* evaluate a tag field of a ZTK format processor based on a ZTK property. */
+void *_ZTKEvalTag(void *obj, void *arg, ZTK *ztk, ZTKPrp prp[], int num)
 {
   register int i;
   int *count;
@@ -575,12 +586,12 @@ void *_ZTKEncodeTag(void *obj, void *arg, ZTK *ztk, ZTKPrp prp[], int num)
   }
   for( i=0; i<num; i++ ){
     ZTKTagRewind( ztk );
-    if( prp[i].encode ) do{
+    if( prp[i]._eval ) do{
       if( ZTKTagCmp( ztk, prp[i].str ) ){
         if( prp[i].num > 0 && count[i] >= prp[i].num ){
           ZRUNWARN( ZEDA_WARN_ZTK_TOOMANY_TAGS, prp[i].str );
         } else
-        if( !prp[i].encode( obj, count[i]++, arg, ztk ) ){
+        if( !prp[i]._eval( obj, count[i]++, arg, ztk ) ){
           obj = NULL;
           goto TERMINATE;
         }
@@ -598,10 +609,10 @@ void _ZTKPrpTagFPrint(FILE *fp, void *obj, ZTKPrp prp[], int num)
   register int i, j;
 
   for( i=0; i<num; i++ )
-    if( prp[i].fprintf ){
+    if( prp[i]._fprint ){
       for( j=0; j<prp[i].num; j++ ){
         fprintf( fp, "[%s]\n", prp[i].str );
-        prp[i].fprintf( fp, j, obj );
+        prp[i]._fprint( fp, j, obj );
       }
     }
 }

@@ -361,26 +361,29 @@ __EXPORT char zFSkipDelimiter(FILE *fp);
  */
 __EXPORT char *zSSkipDelimiter(char *str);
 
-/*! \brief skip comments.
- *
- * zFSkipComment() skips comments, a one-line string
- * which begins with \a ident, in a file \a fp.
- * Vague lines are also skipped.
- * \return
- * zFSkipComment() returns the next charactor to the
- * final comment, which is put back to the file.
- * If the file reaches EOF, the null charactor is
- * returned.
- */
-__EXPORT char zFSkipComment(FILE *fp, char ident);
-
 #define ZDEFAULT_COMMENT_IDENT '%'
 
-/*! \brief skip default comment beginning with '\%'.
+/*! \brief specify the comment identifier. */
+__EXPORT void zSetCommentIdent(char ident);
+
+/*! \brief reset the comment identifier. */
+__EXPORT void zResetCommentIdent(void);
+
+/*! \brief skip comments.
+ *
+ * zFSkipComment() skips comments, i.e., a one-line string which
+ * begins with a specified identifier, in a file \a fp.
  * Vague lines are also skipped.
- * [RETURN VALUE]
+ * The identifier can be set by zSetCommentIdent() and be reset
+ * by zResetCommentIdent().
+ * \return
+ * zFSkipComment() returns the next charactor to the last comment,
+ * which is put back to the file.
+ * If the file reaches EOF, the null charactor is returned.
+ * \sa
+ * zSetCommentIdent, zResetCommentIdent
  */
-#define zFSkipDefaultComment(f) zFSkipComment( (f), ZDEFAULT_COMMENT_IDENT )
+__EXPORT char zFSkipComment(FILE *fp);
 
 /*! \brief tokenize a file.
  *
