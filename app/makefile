@@ -15,11 +15,14 @@ TARGET=$(CONFIG)
 #####################################################################
 all: $(TARGET)
 
+config-gen: $(CONFIGGEN)
+	@echo " INSTALL" $(CONFIGGEN)
+	@$(INSTALL) $(CONFIGGEN) $(BINDIR)
 $(CONFIG):
 	@echo " GENERATE" $(CONFIG)
 	-@rm -f $(CONFIG)
-	@sh $(CONFIGGEN) -I $(PREFIX)/include -L $(PREFIX)/lib -l "$(LINK)" -v $(VERSION) > $(CONFIG)
-install: $(INSTALLTARGET)
+	@$(CONFIGGEN) -I $(PREFIX)/include -L $(PREFIX)/lib -l "$(LINK)" -v $(VERSION) > $(CONFIG)
+install: $(CHKDEP) $(TARGET)
 	@echo " INSTALL	" $^
 	@$(INSTALL) $^ $(BINDIR)
 clean:

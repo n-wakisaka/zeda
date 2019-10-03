@@ -12,7 +12,7 @@ SAMPLEDIR:=$(ROOTDIR)/example
 
 all:
 	@cd $(SRCDIR); make
-	@cd $(APPDIR); make
+	@cd $(APPDIR); make config-gen all
 autotest:
 	@cd $(TESTDIR); ./test.sh
 doc:
