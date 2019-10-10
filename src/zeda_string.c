@@ -6,6 +6,7 @@
 
 #include <zeda/zeda_string.h>
 #include <ctype.h>
+#include <stdarg.h>
 
 static const char *znullstring = "";
 char *zNullStr(void){ return (char *)znullstring; }
@@ -50,6 +51,18 @@ char *zStrCat(char *dest, const char *src, size_t size)
 
   ld = strlen(dest);
   return zStrCopy( dest+ld, src, size-ld );
+}
+
+/* concatenate a string with a formatted string. */
+char *zStrCatPrint(char *str, size_t size, char *fmt, ...)
+{
+  va_list args;
+  char buf[BUFSIZ];
+
+  va_start( args, fmt );
+  vsprintf( buf, fmt, args );
+  va_end( args );
+  return zStrCat( str, buf, size );
 }
 
 /* concatenate a string with a charactor. */
@@ -289,7 +302,7 @@ char *_zFString(FILE *fp, char *tkn, size_t size)
   for( i=0; !feof(fp); i++ ){
     if( i >= size ){
       ZRUNWARN( ZEDA_WARN_TOOLNG_STR );
-      i = zMax( size, 0 );
+      i = _zMax( size, 0 );
       break;
     }
     tkn[i] = fgetc( fp );
@@ -312,7 +325,7 @@ char *_zSString(char *str, char *tkn, size_t size)
       break;
     if( i >= size ){
       ZRUNWARN( ZEDA_WARN_TOOLNG_STR );
-      i = zMax( size, 0 );
+      i = _zMax( size, 0 );
       break;
     }
     tkn[i] = *sp;
@@ -337,7 +350,7 @@ char *zFToken(FILE *fp, char *tkn, size_t size)
   for( i=1; !feof(fp); i++ ){
     if( i >= size ){
       ZRUNWARN( ZEDA_WARN_TOOLNG_TKN );
-      i = zMax( size, 0 );
+      i = _zMax( size, 0 );
       break;
     }
     if( zIsDelimiter( ( tkn[i] = fgetc( fp ) ) ) ) break;
@@ -365,7 +378,7 @@ char *zSToken(char *str, char *tkn, size_t size)
   for( i=1; *sp && !zIsDelimiter(*sp); i++ ){
     if( i >= size ){
       ZRUNWARN( ZEDA_WARN_TOOLNG_TKN );
-      i = zMax( size, 0 );
+      i = _zMax( size, 0 );
       break;
     }
     tkn[i] = *sp++;
@@ -384,7 +397,7 @@ char *zFIntToken(FILE *fp, char *tkn, size_t size)
   for( i=0; ; i++ ){
     if( i >= size ){
       ZRUNWARN( ZEDA_WARN_TOOLNG_NUM );
-      i = zMax( size, 0 );
+      i = _zMax( size, 0 );
       break;
     }
     if( ( tkn[i] = fgetc(fp) ) == EOF ) break;
@@ -481,7 +494,7 @@ char *zSIntToken(char *str, char *tkn, size_t size)
   for( sp=str, i=0; isdigit(*sp); tkn[i++]=*sp++ )
     if( i >= size ){
       ZRUNWARN( ZEDA_WARN_TOOLNG_NUM );
-      i = zMax( size, 0 );
+      i = _zMax( size, 0 );
       break;
     }
   tkn[i] = '\0';
