@@ -10,11 +10,9 @@ DOCDIR:=$(ROOTDIR)/doc
 TESTDIR:=$(ROOTDIR)/test
 SAMPLEDIR:=$(ROOTDIR)/example
 
-LIBFILE=`grep DLIB= $(SRCDIR)/makefile | cut -d = -f2`
-
 all:
 	@cd $(SRCDIR); make
-	@cd $(APPDIR); make
+	@cd $(APPDIR); make config-gen all
 autotest:
 	@cd $(TESTDIR); ./test.sh
 doc:
@@ -36,8 +34,8 @@ install:
 	@cd $(APPDIR); make install
 uninstall:
 	@echo " UNINSTALL	library"
-	-@rm -f $(PREFIX)/lib/$(LIBFILE)
+	-@rm $(PREFIX)/lib/lib$(PROJNAME).so
 	@echo " UNINSTALL	header files"
-	-@rm -f -r $(PREFIX)/include/$(PROJNAME)/
+	-@rm -r $(PREFIX)/include/$(PROJNAME)
 	@echo " UNINSTALL	applications"
 	@cd $(APPDIR); make uninstall

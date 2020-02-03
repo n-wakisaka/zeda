@@ -1,92 +1,103 @@
 ZEDA - Elementary Data and Algorithms
-Copyright (C) 1998 Tomomichi Sugihara (Zhidao)
+=================================================================
+Copyright (C) Tomomichi Sugihara (Zhidao) since 1998
 
 | *master* | *develop* |
 |----------|-----------|
 | [![Build Status](https://travis-ci.org/n-wakisaka/zeda.svg?branch=master)](https://travis-ci.org/n-wakisaka/zeda) | [![Build Status](https://travis-ci.org/n-wakisaka/zeda.svg?branch=develop)](https://travis-ci.org/n-wakisaka/zeda) |
 
-
 -----------------------------------------------------------------
-[What is this?]
+## [What is this?]
 
 ZEDA is a collection of frequently used data structures and
 algorithms including:
 
- - bit operations
- - array operation
- - list operation
- - round-robin table
- - string operations
- - command line option manipulation
- - generalized I/O stream
- - random number generator
+- bit operations
+- array operations
+- list operations
+- round-robin table operations
+- string operations
+- command line option manipulations
+- generalized I/O stream
+- random number generator
+- ZTK format processor
 
 -----------------------------------------------------------------
-[Installation / Uninstallation]
+## [Installation / Uninstallation]
 
-<install>
-1. Unpack the distributed archive where you want.
+### install
 
-% zcat zeda-X.Y.Z.tgz | tar xvf
-or, if you use GNU tar,
-% tar xzvf zeda-X.Y.Z.tgz
+Move to a directly under which you want to install ZEDA, and run:
 
-X.Y.Z is for the revision.
+   ```
+   % git clone https://github.com/zhidao/zeda.git
+   % cd zeda
+   ```
 
-2. Enter the directory.
+Edit **PREFIX** in *config* file if necessary in order to specify
+a directory where the header files, the library and some utilities
+are installed. (default: ~/usr)
 
-% cd zeda-X.Y.Z
+   - header files: $PREFIX/include/zeda
+   - library file: $PREFIX/lib
+   - utilities: $PREFIX/bin
 
-3. Edit config file if necessary.
-  PREFIX   directory where the library is installed.
-           ~/usr as a default. In this case, header files
-           and library are installed under ~/usr/include
-           and ~/usr/lib, respectively.
+Then, make and install.
 
-4. Make it.
+   ```
+   % make && make install
+   ```
 
-% make
+### uninstall
 
-5. Install it.
+Do:
 
-% make install
+   ```
+   % make uninstall
+   ```
 
-Or,
-
-% cp -a lib/libzeda.so $PREFIX/lib/
-% cp -a include/zeda $PREFIX/include/
-% cp -a bin/* $PREFIX/bin/
-
-<uninstall>
-Delete $PREFIX/lib/libzeda.so and $PREFIX/include/zeda.
+which removes $PREFIX/lib/libzeda.so and $PREFIX/include/zeda.
 
 -----------------------------------------------------------------
-[How to use]
+## [How to use]
 
-You may need to set your PATH and LD_LIBRARY_PATH environment
-variables. This is done by:
- export PATH=$PATH:$PREFIX/bin
- export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PREFIX/lib
-if your working shell is Bourne shell (bash, zsh, etc.), or by:
- set path = ( $path $PREFIX/bin )
- setenv LD_LIBRARY_PATH $LD_LIBRARY_PATH:$PREFIX/lib
-if your working shell is C shell (csh, tcsh, etc.).
+Set your **PATH** and **LD\_LIBRARY\_PATH** environment variables.
+This is done by:
 
-When you want to compile your code test.c, for example, the following
-line will work.
+   ```
+   % export PATH=$PATH:$PREFIX/bin
+   % export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PREFIX/lib
+   ```
 
-% gcc `zeda-config -L` `zeda-config -I` test.c `zeda-config -l`
+for Bourne shell family (bash, zsh, etc.), or by:
+
+   ```
+   % set path = ( $path $PREFIX/bin )
+   % setenv LD_LIBRARY_PATH $LD_LIBRARY_PATH:$PREFIX/lib
+   ```
+
+for C shell family (csh, tcsh, etc.).
+
+When you want to compile your code *test.c*, for example, the following line will work.
+
+   ```
+   % gcc `zeda-config -L` `zeda-config -I` test.c `zeda-config -l`
+   ```
 
 -----------------------------------------------------------------
-[Documents]
+## [Documents]
 
-If you have doxygen:
-http://www.doxygen.org/
-the following works:
-% make document
-to generate HTML documents under doc/
+Download *doxygen* from http://www.doxygen.org/
+and run:
+
+   ```
+   % make document
+   ```
+
+to generate HTML documents under doc/.
 
 -----------------------------------------------------------------
-[Contact]
+## [Contact]
 
 zhidao@ieee.org
+

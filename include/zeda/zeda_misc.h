@@ -35,9 +35,12 @@ __BEGIN_DECLS
  * return a saturated value of \a x with the lower
  * boundary \a l and the upper boundary \a u.
  */
-#define zMax(x,y)     ( (x)>=(y) ? (x) : (y) )
-#define zMin(x,y)     ( (x)<=(y) ? (x) : (y) )
-#define zLimit(x,l,u) ( (x)<=(l) ? (l) : ( (x)>=(u) ? (u) : (x) ) )
+#define _zMax(x,y)     ( (x)>=(y) ? (x) : (y) )
+__EXPORT double zMax(double x, double y);
+#define _zMin(x,y)     ( (x)<=(y) ? (x) : (y) )
+__EXPORT double zMin(double x, double y);
+#define _zLimit(x,l,u) ( (x)<=(l) ? (l) : ( (x)>=(u) ? (u) : (x) ) )
+__EXPORT double zLimit(double x, double l, double u);
 
 /*! \brief
  * return a saturated value of \a x with two boundaries \a b1 and
@@ -226,6 +229,16 @@ __EXPORT char *itoa_fill(int val, int size, char pat, char *buf);
  * \sa itoa_fill
  */
 #define itoa_zerofill(v,s,b) itoa_fill( (v), (s), '0', (b) )
+
+/*! \brief convert an integer number to a string that represents an ordinal.
+ *
+ * itoa_ordinal() converts an integer number \a val into a string
+ * that represents an ordinal, and stores it into \a buf.
+ * \a size is the size of \a buf.
+ * \return
+ * itoa_ordinal() returns a pointer \a buf.
+ */
+__EXPORT char *itoa_ordinal(int val, char *buf, size_t size);
 #endif /* __KERNEL__ */
 
 /*! \} */

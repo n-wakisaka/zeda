@@ -150,11 +150,17 @@ typedef struct{
   zStrListCell *val_cp;
 } ZTK;
 
-/*! \brief register a definition of a set of tag and key to ZTK format processor. */
+/*! \brief register a definition of a tag to a ZTK format processor. */
+#define ZTKDefRegTag(ztk,tag) ZTKDefListFindAndAddTag( &(ztk)->deflist, tag )
+
+/*! \brief register a definition of a set of tag and key to a ZTK format processor. */
 #define ZTKDefRegOne(ztk,tag,key) ZTKDefListRegOne( &(ztk)->deflist, tag, key )
 
-/*! \brief register a definition of a set of tag and keys to ZTK format processor. */
+/*! \brief register a definition of a set of tag and keys to a ZTK format processor. */
 #define ZTKDefReg(ztk,tag,keylist) ZTKDefListReg( &(ztk)->deflist, tag, keylist, sizeof(keylist)/sizeof(char*) )
+
+/*! \brief register a definition of a tagless key to a ZTK format processor. */
+#define ZTKDefRegKey(ztk,key) ZTKDefReg(ztk,"",key)
 
 /*! \brief initialize a ZTK format processor. */
 __EXPORT ZTK *ZTKInit(ZTK *ztk);
@@ -171,6 +177,8 @@ __EXPORT int ZTKCountTag(ZTK *ztk, const char *tag);
 /*! \brief count the number of key fields with a specified key of the current tagged field in a tag-and-key list of a ZTK format processor. */
 __EXPORT int ZTKCountKey(ZTK *ztk, const char *key);
 
+/*! \brief return a pointer to the current value string of the current key field of the current tagged field in a tag-and-key list of a ZTK format processor. */
+#define ZTKValPtr(ztk) (ztk)->val_cp
 /*! \brief return the current value string of the current key field of the current tagged field in a tag-and-key list of a ZTK format processor. */
 #define ZTKVal(ztk) ( (ztk)->val_cp ? (ztk)->val_cp->data : "" )
 /*! \brief move to the next value string in the current key field of the current tagged field in a tag-and-key list of a ZTK format processor. */
@@ -214,25 +222,25 @@ __EXPORT void ZTKFPrint(FILE *fp, ZTK *ztk);
 typedef struct{
   char *str; /*!< a string for a tag/key */
   int num;   /*!< the number of tags/keys */
-  void *(* encode)(void *, int, void *, ZTK *); /*!< ZTK encoder function */
-  void (* fprintf)(FILE *, int, void *); /*!< print out function */
+  void *(* _eval)(void *, int, void *, ZTK *); /*!< ZTK evaluation function */
+  void (* _fprint)(FILE *, int, void *); /*!< print out function */
 } ZTKPrp;
 
 /* register a tag-and-key property to a ZTK format processor. */
 __EXPORT bool ZTKDefListRegPrp(ZTKDefList *list, char *tag, ZTKPrp prp[], int num);
 #define ZTKDefRegPrp(ztk,tag,prp) ZTKDefListRegPrp( &(ztk)->deflist, tag, prp, sizeof(prp)/sizeof(ZTKPrp) )
 
-/* encode a key field of a ZTK format processor based on a ZTK property. */
-__EXPORT void *_ZTKEncodeKey(void *obj, void *arg, ZTK *ztk, ZTKPrp prp[], int num);
-#define ZTKEncodeKey(obj,arg,ztk,prp) _ZTKEncodeKey( obj, arg, ztk, prp, sizeof(prp)/sizeof(ZTKPrp) )
+/* evaluate a key field of a ZTK format processor based on a ZTK property. */
+__EXPORT void *_ZTKEvalKey(void *obj, void *arg, ZTK *ztk, ZTKPrp prp[], int num);
+#define ZTKEvalKey(obj,arg,ztk,prp) _ZTKEvalKey( obj, arg, ztk, prp, sizeof(prp)/sizeof(ZTKPrp) )
 
 /* print out a key field of a ZTK format processor based on a ZTK property. */
 __EXPORT void _ZTKPrpKeyFPrint(FILE *fp, void *obj, ZTKPrp prp[], int num);
 #define ZTKPrpKeyFPrint(fp,obj,prp) _ZTKPrpKeyFPrint( fp, obj, prp, sizeof(prp)/sizeof(ZTKPrp) )
 
-/* encode a tag field of a ZTK format processor based on a ZTK property. */
-__EXPORT void *_ZTKEncodeTag(void *obj, void *arg, ZTK *ztk, ZTKPrp prp[], int num);
-#define ZTKEncodeTag(obj,arg,ztk,prp) _ZTKEncodeTag( obj, arg, ztk, prp, sizeof(prp)/sizeof(ZTKPrp) )
+/* evaluate a tag field of a ZTK format processor based on a ZTK property. */
+__EXPORT void *_ZTKEvalTag(void *obj, void *arg, ZTK *ztk, ZTKPrp prp[], int num);
+#define ZTKEvalTag(obj,arg,ztk,prp) _ZTKEvalTag( obj, arg, ztk, prp, sizeof(prp)/sizeof(ZTKPrp) )
 
 /* print out a tag field of a ZTK format processor based on a ZTK property. */
 __EXPORT void _ZTKPrpTagFPrint(FILE *fp, void *obj, ZTKPrp prp[], int num);

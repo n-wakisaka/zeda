@@ -17,11 +17,18 @@ __DEF_WINDLL
 #include <stdarg.h>
 #include <ctype.h>
 
+/* return the larger of two values. */
+double zMax(double x, double y){ return _zMax( x, y ); }
+/* return the smaller of two values. */
+double zMin(double x, double y){ return _zMin( x, y ); }
+/* return as close value in between the given lower and upper bounds. */
+double zLimit(double x, double l, double u){ return _zLimit( x, l, u ); }
+
 /* saturate a value within a segment. */
 double zBound(double x, double b1, double b2)
 {
   if( b1 > b2 ) zSwap( double, b1, b2 );
-  return zLimit( x, b1, b2 );
+  return _zLimit( x, b1, b2 );
 }
 
 /* ********************************************************** */
@@ -201,6 +208,25 @@ char *itoa_fill(int val, int size, char pat, char *buf)
   }
   for( cp=buf; size>len; size--, cp++ ) *cp = pat;
   strcpy( cp, _itoa_fill_buf );
+  return buf;
+}
+#endif /* __KERNEL__ */
+
+#ifndef __KERNEL__
+/* convert an integer number to a string that represents an ordinal. */
+char *itoa_ordinal(int val, char *buf, size_t size)
+{
+  itoa( val, buf );
+  if( val % 10 == 1 && val % 100 != 11 )
+    strcat( buf, "st" );
+  else
+  if( val % 10 == 2 && val % 100 != 12 )
+    strcat( buf, "nd" );
+  else
+  if( val % 10 == 3 && val % 100 != 13 )
+    strcat( buf, "rd" );
+  else
+    strcat( buf, "th" );
   return buf;
 }
 #endif /* __KERNEL__ */

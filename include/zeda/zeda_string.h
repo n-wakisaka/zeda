@@ -61,6 +61,23 @@ __EXPORT char *zStrClone(char str[]);
  */
 __EXPORT char *zStrCat(char *dest, const char *src, size_t size);
 
+/*! \brief concatenate a string with a formatted string.
+ *
+ * zStrCatPrint() concatenates a formatted string \a fmt to
+ * another string \a str. \a size is the maximum number of
+ * charactors \a str can store. If the sum of lengths of \a src
+ * and \a fmt is beyond \a size, the resulted string is clamped.
+ *
+ * The format of \a fmt and the following variable arguments
+ * conform to printf() family.
+ * \return
+ * zStrCatPrint() returns a pointer \a str.
+ * \note
+ * zStrCatPrint() is not sufficiently secure since it internally
+ * calls vsprintf(), in which the size of \a fmt is not checked.
+ */
+__EXPORT char *zStrCatPrint(char *str, size_t size, char *fmt, ...);
+
 /*! \brief concatenate a string and a charactor.
  *
  * zStrAddChar() appends a charactor \a c to a string
@@ -361,26 +378,29 @@ __EXPORT char zFSkipDelimiter(FILE *fp);
  */
 __EXPORT char *zSSkipDelimiter(char *str);
 
-/*! \brief skip comments.
- *
- * zFSkipComment() skips comments, a one-line string
- * which begins with \a ident, in a file \a fp.
- * Vague lines are also skipped.
- * \return
- * zFSkipComment() returns the next charactor to the
- * final comment, which is put back to the file.
- * If the file reaches EOF, the null charactor is
- * returned.
- */
-__EXPORT char zFSkipComment(FILE *fp, char ident);
-
 #define ZDEFAULT_COMMENT_IDENT '%'
 
-/*! \brief skip default comment beginning with '\%'.
+/*! \brief specify the comment identifier. */
+__EXPORT void zSetCommentIdent(char ident);
+
+/*! \brief reset the comment identifier. */
+__EXPORT void zResetCommentIdent(void);
+
+/*! \brief skip comments.
+ *
+ * zFSkipComment() skips comments, i.e., a one-line string which
+ * begins with a specified identifier, in a file \a fp.
  * Vague lines are also skipped.
- * [RETURN VALUE]
+ * The identifier can be set by zSetCommentIdent() and be reset
+ * by zResetCommentIdent().
+ * \return
+ * zFSkipComment() returns the next charactor to the last comment,
+ * which is put back to the file.
+ * If the file reaches EOF, the null charactor is returned.
+ * \sa
+ * zSetCommentIdent, zResetCommentIdent
  */
-#define zFSkipDefaultComment(f) zFSkipComment( (f), ZDEFAULT_COMMENT_IDENT )
+__EXPORT char zFSkipComment(FILE *fp);
 
 /*! \brief tokenize a file.
  *
