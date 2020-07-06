@@ -84,10 +84,20 @@ typedef long long int      int64_t;      /*!< 64-bit signed integer */
 #endif
 #endif
 
-typedef int8_t   byte;  /*!< signed one-byte data. */
-typedef uint8_t  ubyte; /*!< unsigned one-byte data. */
-typedef int16_t  word;  /*!< signed two-byte data. */
-typedef uint16_t uword; /*!< unsigned two-byte data. */
+#ifndef INT_MAX
+#define INT_MAX ((int)0x7fffffff)
+#endif
+
+#ifndef UINT_MAX
+#define UINT_MAX ((uint)0xffffffffU)
+#endif
+
+typedef int8_t   byte;   /*!< signed one-byte data. */
+typedef uint8_t  ubyte;  /*!< unsigned one-byte data. */
+typedef int16_t  word;   /*!< signed two-byte data. */
+typedef uint16_t uword;  /*!< unsigned two-byte data. */
+typedef int32_t  dword;  /*!< signed four-byte data. */
+typedef uint32_t udword; /*!< unsigned four-byte data. */
 
 #if !defined( _NETBSD_SOURCE )
 /* NetBSD already defines uint and ulong in sys/types.h */
